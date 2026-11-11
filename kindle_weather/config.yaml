@@ -1,0 +1,34 @@
+name: Kindle Weather
+version: "0.2.0"
+slug: kindle_weather
+description: Renders a National Weather Service forecast as a grayscale PNG for a jailbroken Kindle
+url: https://github.com/danzilio/kindle-weather-display
+arch:
+  - aarch64
+  - amd64
+init: false
+homeassistant_api: true
+startup: application
+boot: auto
+ports:
+  8099/tcp: 8099
+ports_description:
+  8099/tcp: Weather image for the Kindle (/weather.png) and sleep schedule (/sleep)
+options:
+  latitude: 42.3876
+  longitude: -71.0995
+  location_name: Somerville
+  refresh_minutes: 30
+  quiet_start: "23:00"
+  quiet_end: "06:00"
+  contact: ""
+  temperature_entity: ""
+schema:
+  latitude: float(-90,90)
+  longitude: float(-180,180)
+  location_name: str
+  refresh_minutes: int(10,180)
+  quiet_start: match(^([01]\d|2[0-3]):[0-5]\d$)
+  quiet_end: match(^([01]\d|2[0-3]):[0-5]\d$)
+  contact: str?
+  temperature_entity: str?
