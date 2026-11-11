@@ -239,7 +239,16 @@ def render(data, location, now=None, battery=None, charging=False, next_update=N
 
     draw_icon(c, M + 170, 245, 290, kind, night)
     tx = 470
-    c.text((tx, 340), f"{round(temp)}°" if temp is not None else "--°", 250, "display", anchor="ls")
+    big = f"{round(temp)}°" if temp is not None else "--°"
+    c.text((tx, 340), big, 250, "display", anchor="ls")
+    if temp is not None:
+        # Celsius, smaller and lighter, baseline-aligned to the right of the Fahrenheit reading
+        celsius = f"{round((temp - 32) * 5 / 9)}°C"
+        cx_ = tx + c.textlen(big, 250, "display") + 12
+        size = 72
+        while size > 40 and cx_ + c.textlen(celsius, size, "display") > W - M:
+            size -= 4
+        c.text((cx_, 340), celsius, size, "display", fill=MID, anchor="ls")
     c.text((tx + 8, 402), cond, 40, "medium", anchor="ls")
 
     daily = data.get("daily") or []
