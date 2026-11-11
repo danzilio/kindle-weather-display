@@ -1,5 +1,5 @@
 name: Kindle Weather
-version: "0.2.0"
+version: "0.3.0"
 slug: kindle_weather
 description: Renders a National Weather Service forecast as a grayscale PNG for a jailbroken Kindle
 url: https://github.com/danzilio/kindle-weather-display

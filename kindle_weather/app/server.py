@@ -87,6 +87,7 @@ def next_wake(now):
 
 
 HA_API = os.environ.get("HA_API", "http://supervisor/core/api")
+VERSION = os.environ.get("ADDON_VERSION") or None
 
 
 def read_entity_temp():
@@ -123,7 +124,7 @@ def make_png(battery, charging):
     local, failed = read_entity_temp()
     img = render.render(data, CFG["location_name"], now=now, battery=battery, charging=charging,
                         next_update=next_wake(now), sun=(s["sunrise"], s["sunset"]), stale=stale,
-                        local_temp=local, local_failed=failed)
+                        local_temp=local, local_failed=failed, version=VERSION)
     buf = io.BytesIO()
     img.save(buf, "PNG", optimize=True)
     return buf.getvalue()

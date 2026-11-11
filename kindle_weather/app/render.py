@@ -213,7 +213,7 @@ def battery_icon(c, x, y, pct, charging=False):
 # ---------------------------------------------------------------- main render
 
 def render(data, location, now=None, battery=None, charging=False, next_update=None, sun=None, stale=False,
-           local_temp=None, local_failed=False):
+           local_temp=None, local_failed=False, version=None):
     tz = ZoneInfo(data.get("tz") or "America/New_York")
     now = now or datetime.now(tz)
     c = Canvas()
@@ -329,10 +329,10 @@ def render(data, location, now=None, battery=None, charging=False, next_update=N
     # ---- footer
     fy = H - 42
     c.line([(M, fy - 46), (W - M, fy - 46)], fill=LIGHT, width=2)
-    left = []
+    if version:
+        c.text((W / 2, fy - 72), f"v{version}", 24, "regular", fill=MID, anchor="ms")
     if sun:
-        left.append(f"Sunrise {clock(sun[0])}   Sunset {clock(sun[1])}")
-    c.text((M, fy), "   ".join(left), 26, "regular", fill=DARK, anchor="ls")
+        c.text((M, fy), f"Sunrise {clock(sun[0])}   Sunset {clock(sun[1])}", 26, "regular", fill=DARK, anchor="ls")
     upd = datetime.fromtimestamp(data.get("fetched_at", now.timestamp()), tz)
     right = f"{'Offline · data from ' if stale else 'Updated '}{clock(upd if stale else now)}"
     if next_update and (next_update - now).total_seconds() > 3600:
