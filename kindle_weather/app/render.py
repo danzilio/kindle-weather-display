@@ -330,7 +330,7 @@ def render(data, location, now=None, battery=None, charging=False, next_update=N
     fy = H - 42
     c.line([(M, fy - 46), (W - M, fy - 46)], fill=LIGHT, width=2)
     if version:
-        c.text((W / 2, fy - 72), f"v{version}", 24, "regular", fill=MID, anchor="ms")
+        c.text((W - M, fy - 72), f"v{version}", 24, "regular", fill=MID, anchor="rs")
     if sun:
         c.text((M, fy), f"Sunrise {clock(sun[0])}   Sunset {clock(sun[1])}", 26, "regular", fill=DARK, anchor="ls")
     upd = datetime.fromtimestamp(data.get("fetched_at", now.timestamp()), tz)
