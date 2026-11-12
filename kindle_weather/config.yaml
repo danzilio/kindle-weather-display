@@ -1,5 +1,5 @@
 name: Kindle Weather
-version: "0.3.2"
+version: "0.4.0"
 slug: kindle_weather
 description: Renders a National Weather Service forecast as a grayscale PNG for a jailbroken Kindle
 url: https://github.com/danzilio/kindle-weather-display
@@ -8,6 +8,8 @@ arch:
   - amd64
 init: false
 homeassistant_api: true
+services:
+  - mqtt:want
 startup: application
 boot: auto
 ports:

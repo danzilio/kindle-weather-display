@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 — 2026-11-12
+
+- The Kindle now appears as a **Kindle Weather Display** device in Home Assistant via MQTT discovery, with Battery, Charging, Last check-in and Next wake-up entities. Needs an MQTT broker (e.g. the Mosquitto add-on); credentials are picked up from the Supervisor automatically.
+
 ## 0.3.2 — 2026-11-11
 
 - Show the current temperature in Celsius, smaller and lighter, to the right of the Fahrenheit reading.

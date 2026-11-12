@@ -9,6 +9,7 @@ grayscale PNG for a jailbroken Kindle Paperwhite (7th gen) used as an e-ink weat
 - Optional Home Assistant sensor for the headline temperature, with fallback to NWS
 - Next-12-hours chart: precipitation chance, or a temperature curve when no precipitation is forecast
 - 5-day forecast, sunrise/sunset, battery level reported by the Kindle
+- Kindle shows up as a Home Assistant device (via MQTT) with battery, charging, last check-in and next wake-up
 - `/sleep` endpoint tells the Kindle how long to deep-sleep, honouring a quiet window overnight
 
 ## Install
