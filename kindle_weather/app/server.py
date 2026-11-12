@@ -15,6 +15,7 @@ from astral import LocationInfo
 from astral.sun import sun
 
 import render
+from ha_mqtt import KindleMQTT
 from weather import NWS
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -88,6 +89,7 @@ def next_wake(now):
 
 HA_API = os.environ.get("HA_API", "http://supervisor/core/api")
 VERSION = os.environ.get("ADDON_VERSION") or None
+ha_device = KindleMQTT(version=VERSION)
 
 
 def read_entity_temp():
@@ -147,9 +149,11 @@ class Handler(BaseHTTPRequestHandler):
                 bat = q.get("battery", [None])[0]
                 bat = int(float(bat)) if bat not in (None, "") else None
                 chg = q.get("charging", ["0"])[0] in ("1", "true", "yes")
-                if bat is not None:
+                if bat is not None:  # a Kindle check-in (the browser preview sends no battery)
                     with lock:
                         state.update(battery=bat, charging=chg, last_seen=time.time())
+                    now = datetime.now(tz())
+                    ha_device.checkin(bat, chg, now, next_wake(now))
                 self._send(200, make_png(bat, chg), "image/png")
             elif u.path == "/sleep":
                 now = datetime.now(tz())
@@ -176,6 +180,7 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     threading.Thread(target=refresher, daemon=True).start()
+    ha_device.start()
     port = int(CFG.get("port", 8099))
     log.info("listening on :%d for %s", port, CFG["location_name"])
     ThreadingHTTPServer(("0.0.0.0", port), Handler).serve_forever()

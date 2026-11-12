@@ -2,7 +2,7 @@ FROM python:3.12-alpine
 # Home Assistant passes the add-on version as a build arg; shown in the display footer
 ARG BUILD_VERSION=dev
 ENV ADDON_VERSION=$BUILD_VERSION
-RUN pip install --no-cache-dir pillow==12.* astral==3.* tzdata
+RUN pip install --no-cache-dir pillow==12.* astral==3.* tzdata paho-mqtt==2.*
 # Inter font (SIL OFL 1.1), fetched from the official release and checksum-verified
 ARG INTER_URL=https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip
 ARG INTER_SHA256=9883fdd4a49d4fb66bd8177ba6625ef9a64aa45899767dde3d36aa425756b11e
