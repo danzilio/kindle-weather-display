@@ -22,22 +22,26 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 log = logging.getLogger("kindle-weather")
 
 
-def load_config():
-    defaults = {
-        "latitude": 42.3876, "longitude": -71.0995, "location_name": "Somerville",
-        "refresh_minutes": 30, "quiet_start": "23:00", "quiet_end": "06:00",
-        "contact": "", "port": 8099, "temperature_entity": "",
-    }
-    path = os.environ.get("OPTIONS", "/data/options.json")
+DEFAULTS = {
+    "latitude": 42.3876, "longitude": -71.0995, "location_name": "Somerville",
+    "refresh_minutes": 30, "quiet_start": "23:00", "quiet_end": "06:00",
+    "contact": "", "port": 8099, "temperature_entity": "",
+}
+
+
+def load_config(path=None):
+    cfg = dict(DEFAULTS)
+    path = path or os.environ.get("OPTIONS", "/data/options.json")
     if os.path.exists(path):
         with open(path) as f:
-            defaults.update({k: v for k, v in json.load(f).items() if v not in (None, "")})
-    return defaults
+            cfg.update({k: v for k, v in json.load(f).items() if v not in (None, "")})
+    return cfg
 
 
-CFG = load_config()
-UA = f"kindle-weather-display ({CFG['contact'] or 'home-assistant add-on'})"
-nws = NWS(float(CFG["latitude"]), float(CFG["longitude"]), UA)
+# Set up by configure(); importing this module has no side effects so it can be tested.
+CFG = dict(DEFAULTS)
+nws = None
+ha_device = None
 state = {"data": None, "error": None, "battery": None, "charging": False, "last_seen": None}
 lock = threading.Lock()
 
@@ -89,7 +93,15 @@ def next_wake(now):
 
 HA_API = os.environ.get("HA_API", "http://supervisor/core/api")
 VERSION = os.environ.get("ADDON_VERSION") or None
-ha_device = KindleMQTT(version=VERSION)
+
+
+def configure(cfg, device=None):
+    """Install the config and create the NWS client and Home Assistant device publisher."""
+    global CFG, nws, ha_device
+    CFG = cfg
+    ua = f"kindle-weather-display ({cfg['contact'] or 'home-assistant add-on'})"
+    nws = NWS(float(cfg["latitude"]), float(cfg["longitude"]), ua)
+    ha_device = device if device is not None else KindleMQTT(version=VERSION)
 
 
 def read_entity_temp():
@@ -111,6 +123,14 @@ def read_entity_temp():
     except Exception as e:
         log.warning("temperature entity %s unavailable: %s", ent, e)
         return None, True
+
+
+def parse_battery(raw):
+    """Battery % from the query string, or None if missing or unparseable."""
+    try:
+        return int(float(raw))
+    except (TypeError, ValueError, OverflowError):
+        return None
 
 
 def make_png(battery, charging):
@@ -146,8 +166,7 @@ class Handler(BaseHTTPRequestHandler):
         q = parse_qs(u.query)
         try:
             if u.path in ("/weather.png", "/kindle.png"):
-                bat = q.get("battery", [None])[0]
-                bat = int(float(bat)) if bat not in (None, "") else None
+                bat = parse_battery(q.get("battery", [None])[0])
                 chg = q.get("charging", ["0"])[0] in ("1", "true", "yes")
                 if bat is not None:  # a Kindle check-in (the browser preview sends no battery)
                     with lock:
@@ -178,9 +197,14 @@ class Handler(BaseHTTPRequestHandler):
         log.info("%s %s", self.address_string(), fmt % args)
 
 
-if __name__ == "__main__":
+def main():
+    configure(load_config())
     threading.Thread(target=refresher, daemon=True).start()
     ha_device.start()
     port = int(CFG.get("port", 8099))
     log.info("listening on :%d for %s", port, CFG["location_name"])
     ThreadingHTTPServer(("0.0.0.0", port), Handler).serve_forever()
+
+
+if __name__ == "__main__":
+    main()
