@@ -1,0 +1,6 @@
+# Runtime deps (keep in step with kindle_weather/Dockerfile) plus test tools
+pillow==12.*
+astral==3.*
+tzdata
+paho-mqtt==2.*
+pytest>=8

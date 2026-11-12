@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1 — 2026-11-12
+
+- An unreadable `battery=` value no longer stops the image from being served; it's ignored and isn't counted as a check-in.
+
 ## 0.4.0 — 2026-11-12
 
 - The Kindle now appears as a **Kindle Weather Display** device in Home Assistant via MQTT discovery, with Battery, Charging, Last check-in and Next wake-up entities. Needs an MQTT broker (e.g. the Mosquitto add-on); credentials are picked up from the Supervisor automatically.

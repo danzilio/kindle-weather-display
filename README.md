@@ -26,3 +26,12 @@ See [kindle_weather/DOCS.md](kindle_weather/DOCS.md) for endpoints and options.
 The Kindle fetches `/weather.png?battery=NN&charging=0|1`, draws it with `eips`, asks
 `/sleep` for the number of seconds until the next refresh, then suspends to RAM with an RTC
 wake alarm. The device script isn't published in this repository yet.
+
+## Development
+
+```sh
+pip install -r requirements-dev.txt
+pytest
+```
+
+Tests run on every push and pull request via GitHub Actions.
